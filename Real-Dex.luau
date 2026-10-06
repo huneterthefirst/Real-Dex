@@ -15896,83 +15896,86 @@ Main = (function()
 			return o
 		end
 
-		local root = mk("Frame",gui,{BackgroundColor3=Color3.fromRGB(3,6,10),BorderSizePixel=0,Size=UDim2.fromScale(1,1)})
-		local topLine = mk("Frame",root,{BackgroundColor3=Color3.fromRGB(77,170,255),BorderSizePixel=0,Position=UDim2.fromScale(0,0),Size=UDim2.new(0,0,0,2),ZIndex=20})
-		local leftGlow = mk("Frame",root,{AnchorPoint=Vector2.new(0,0.5),BackgroundColor3=Color3.fromRGB(32,112,190),BackgroundTransparency=0.92,BorderSizePixel=0,Position=UDim2.fromScale(0.12,0.5),Size=UDim2.fromOffset(620,620),ZIndex=1})
-		mk("UICorner",leftGlow,{CornerRadius=UDim.new(1,0)})
-		local rightGlow = mk("Frame",root,{AnchorPoint=Vector2.new(0.5,0.5),BackgroundColor3=Color3.fromRGB(47,141,255),BackgroundTransparency=0.95,BorderSizePixel=0,Position=UDim2.fromScale(0.78,0.5),Size=UDim2.fromOffset(460,460),ZIndex=1})
-		mk("UICorner",rightGlow,{CornerRadius=UDim.new(1,0)})
+		local root = mk("Frame",gui,{BackgroundColor3=Color3.fromRGB(2,4,8),BorderSizePixel=0,Size=UDim2.fromScale(1,1)})
+		local vignette = mk("Frame",root,{BackgroundColor3=Color3.fromRGB(0,0,0),BackgroundTransparency=0.48,BorderSizePixel=0,Size=UDim2.fromScale(1,1),ZIndex=30})
+		local topLine = mk("Frame",root,{BackgroundColor3=Color3.fromRGB(92,184,255),BorderSizePixel=0,Position=UDim2.fromScale(0,0),Size=UDim2.new(0,0,0,2),ZIndex=40})
 
-		local scanlines = {}
-		for i=1,15 do
-			local line = mk("Frame",root,{BackgroundColor3=Color3.fromRGB(80,130,165),BackgroundTransparency=0.94,BorderSizePixel=0,Position=UDim2.new(0,0,i/15,0),Size=UDim2.new(1,0,0,1),ZIndex=2})
-			scanlines[#scanlines+1]=line
-		end
-		local vertical = {}
-		for i=1,10 do
-			local line = mk("Frame",root,{BackgroundColor3=Color3.fromRGB(80,130,165),BackgroundTransparency=0.965,BorderSizePixel=0,Position=UDim2.new(i/10,0,0,0),Size=UDim2.new(0,1,1,0),ZIndex=2})
-			vertical[#vertical+1]=line
-		end
+		local backGlow = mk("Frame",root,{AnchorPoint=Vector2.new(0.5,0.5),BackgroundColor3=Color3.fromRGB(30,115,190),BackgroundTransparency=0.92,BorderSizePixel=0,Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(700,700),ZIndex=1})
+		mk("UICorner",backGlow,{CornerRadius=UDim.new(1,0)})
+		local backGlow2 = mk("Frame",root,{AnchorPoint=Vector2.new(0.5,0.5),BackgroundColor3=Color3.fromRGB(66,164,255),BackgroundTransparency=0.95,BorderSizePixel=0,Position=UDim2.fromScale(0.5,0.47),Size=UDim2.fromOffset(420,420),ZIndex=1})
+		mk("UICorner",backGlow2,{CornerRadius=UDim.new(1,0)})
 
-		local panel = mk("Frame",root,{AnchorPoint=Vector2.new(0,0.5),BackgroundColor3=Color3.fromRGB(7,12,19),BackgroundTransparency=0.04,BorderSizePixel=0,Position=UDim2.fromScale(0.09,0.5),Size=UDim2.fromOffset(490,330),ZIndex=8})
-		mk("UIStroke",panel,{Color=Color3.fromRGB(39,74,105),Thickness=1,Transparency=0.25})
-		local panelAccent = mk("Frame",panel,{BackgroundColor3=Color3.fromRGB(76,169,255),BorderSizePixel=0,Position=UDim2.fromOffset(0,0),Size=UDim2.new(0,3,1,0),ZIndex=9})
-		local eyebrow = mk("TextLabel",panel,{BackgroundTransparency=1,Position=UDim2.fromOffset(28,24),Size=UDim2.fromOffset(420,20),Font=Enum.Font.Code,Text="REAL DEX // INITIALIZATION",TextColor3=Color3.fromRGB(92,174,235),TextSize=12,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=10})
-		local title = mk("TextLabel",panel,{BackgroundTransparency=1,Position=UDim2.fromOffset(25,55),Size=UDim2.fromOffset(440,58),Font=Enum.Font.GothamBlack,Text="REAL DEX",TextColor3=Color3.fromRGB(242,248,255),TextSize=42,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=10})
-		local titleStroke = mk("UIStroke",title,{Color=Color3.fromRGB(45,137,220),Thickness=1.2,Transparency=0.35})
-		local subtitle = mk("TextLabel",panel,{BackgroundTransparency=1,Position=UDim2.fromOffset(29,111),Size=UDim2.fromOffset(430,22),Font=Enum.Font.Code,Text="BY MISTAR NOVIER  /  ENGINE INSPECTION",TextColor3=Color3.fromRGB(105,130,151),TextSize=11,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=10})
-		local divider = mk("Frame",panel,{BackgroundColor3=Color3.fromRGB(32,57,78),BorderSizePixel=0,Position=UDim2.fromOffset(28,147),Size=UDim2.new(1,-56,0,1),ZIndex=10})
-
-		local statusPrefix = mk("TextLabel",panel,{BackgroundTransparency=1,Position=UDim2.fromOffset(28,169),Size=UDim2.fromOffset(82,20),Font=Enum.Font.Code,Text="STATUS",TextColor3=Color3.fromRGB(69,112,145),TextSize=11,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=10})
-		local status = mk("TextLabel",panel,{BackgroundTransparency=1,Position=UDim2.fromOffset(100,169),Size=UDim2.fromOffset(350,20),Font=Enum.Font.Code,Text=initStatus or "Initializing",TextColor3=Color3.fromRGB(204,222,239),TextSize=12,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=10})
-		local statusDot = mk("Frame",panel,{BackgroundColor3=Color3.fromRGB(72,178,255),BorderSizePixel=0,Position=UDim2.fromOffset(451,174),Size=UDim2.fromOffset(7,7),ZIndex=10})
-		mk("UICorner",statusDot,{CornerRadius=UDim.new(1,0)})
-
-		local barBack = mk("Frame",panel,{BackgroundColor3=Color3.fromRGB(17,30,42),BorderSizePixel=0,Position=UDim2.fromOffset(28,207),Size=UDim2.new(1,-56,0,7),ZIndex=10})
-		mk("UICorner",barBack,{CornerRadius=UDim.new(1,0)})
-		local bar = mk("Frame",barBack,{BackgroundColor3=Color3.fromRGB(65,161,255),BorderSizePixel=0,Size=UDim2.new(0,0,1,0),ZIndex=11})
-		mk("UICorner",bar,{CornerRadius=UDim.new(1,0)})
-		local barGlow = mk("Frame",barBack,{BackgroundColor3=Color3.fromRGB(130,207,255),BackgroundTransparency=0.55,BorderSizePixel=0,Position=UDim2.new(1,-3,0,-2),Size=UDim2.fromOffset(6,11),ZIndex=12})
-		mk("UICorner",barGlow,{CornerRadius=UDim.new(1,0)})
-		local percent = mk("TextLabel",panel,{BackgroundTransparency=1,Position=UDim2.fromOffset(28,226),Size=UDim2.fromOffset(70,20),Font=Enum.Font.Code,Text="000%",TextColor3=Color3.fromRGB(86,176,255),TextSize=12,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=10})
-		local detail = mk("TextLabel",panel,{BackgroundTransparency=1,Position=UDim2.new(0,108,0,226),Size=UDim2.new(1,-136,0,20),Font=Enum.Font.Code,Text="SCHEMA / RUNTIME / UI",TextColor3=Color3.fromRGB(68,94,114),TextSize=10,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=10})
-
-		local footer = mk("TextLabel",panel,{BackgroundTransparency=1,Position=UDim2.fromOffset(28,274),Size=UDim2.fromOffset(430,24),Font=Enum.Font.Code,Text="[ RDX ]  BUILD 4.0  ·  ONLINE",TextColor3=Color3.fromRGB(63,93,115),TextSize=10,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=10})
-		local cursor = mk("Frame",panel,{BackgroundColor3=Color3.fromRGB(92,184,255),BorderSizePixel=0,Position=UDim2.fromOffset(28,302),Size=UDim2.fromOffset(42,2),ZIndex=10})
-
-		local core = mk("Frame",root,{AnchorPoint=Vector2.new(0.5,0.5),BackgroundTransparency=1,Position=UDim2.fromScale(0.78,0.5),Size=UDim2.fromOffset(360,360),ZIndex=9})
-		local coreGlow = mk("Frame",core,{AnchorPoint=Vector2.new(0.5,0.5),BackgroundColor3=Color3.fromRGB(56,157,255),BackgroundTransparency=0.94,Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(230,230),ZIndex=9})
-		mk("UICorner",coreGlow,{CornerRadius=UDim.new(1,0)})
-		local coreRing = mk("Frame",core,{AnchorPoint=Vector2.new(0.5,0.5),BackgroundTransparency=1,Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(206,206),ZIndex=10})
-		mk("UICorner",coreRing,{CornerRadius=UDim.new(1,0)})
-		mk("UIStroke",coreRing,{Color=Color3.fromRGB(53,128,190),Thickness=1,Transparency=0.2})
-		local coreRing2 = mk("Frame",core,{AnchorPoint=Vector2.new(0.5,0.5),BackgroundTransparency=1,Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(158,158),ZIndex=10})
-		mk("UICorner",coreRing2,{CornerRadius=UDim.new(1,0)})
-		mk("UIStroke",coreRing2,{Color=Color3.fromRGB(102,194,255),Thickness=2,Transparency=0.28})
-		local coreText = mk("TextLabel",core,{AnchorPoint=Vector2.new(0.5,0.5),BackgroundTransparency=1,Position=UDim2.fromScale(0.5,0.46),Size=UDim2.fromOffset(170,62),Font=Enum.Font.GothamBlack,Text="RD",TextColor3=Color3.fromRGB(236,248,255),TextSize=54,ZIndex=13})
-		mk("UIStroke",coreText,{Color=Color3.fromRGB(61,158,239),Thickness=1.5,Transparency=0.3})
-		local coreSub = mk("TextLabel",core,{AnchorPoint=Vector2.new(0.5,0),BackgroundTransparency=1,Position=UDim2.fromScale(0.5,0.62),Size=UDim2.fromOffset(220,20),Font=Enum.Font.Code,Text="REFLECTION CORE",TextColor3=Color3.fromRGB(85,139,171),TextSize=10,ZIndex=13})
-
-		local orbit = {}
+		local grid = {}
 		for i=1,16 do
-			local seg = mk("Frame",core,{AnchorPoint=Vector2.new(0.5,1),BackgroundColor3=Color3.fromRGB(66,157,228),BackgroundTransparency=0.25+(i%3)*0.12,BorderSizePixel=0,Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(3,18),Rotation=(i-1)*22.5,ZIndex=12})
-			orbit[#orbit+1]=seg
+			local line=mk("Frame",root,{BackgroundColor3=Color3.fromRGB(80,145,185),BackgroundTransparency=0.965,BorderSizePixel=0,Position=UDim2.new(i/16,0,0,0),Size=UDim2.new(0,1,1,0),ZIndex=2})
+			grid[#grid+1]=line
+		end
+		for i=1,12 do
+			local line=mk("Frame",root,{BackgroundColor3=Color3.fromRGB(80,145,185),BackgroundTransparency=0.968,BorderSizePixel=0,Position=UDim2.new(0,0,i/12,0),Size=UDim2.new(1,0,0,1),ZIndex=2})
+			grid[#grid+1]=line
 		end
 
-		local telemetry = mk("Frame",root,{AnchorPoint=Vector2.new(0,1),BackgroundTransparency=1,Position=UDim2.fromScale(0.09,0.92),Size=UDim2.fromOffset(490,70),ZIndex=8})
-		local telemetryText = mk("TextLabel",telemetry,{BackgroundTransparency=1,Size=UDim2.fromScale(1,1),Font=Enum.Font.Code,Text="MEM  0.0%     API  WAIT     NET  READY\nREFLECTION DATABASE  /  CONNECTING...",TextColor3=Color3.fromRGB(52,82,101),TextSize=10,TextXAlignment=Enum.TextXAlignment.Left,TextYAlignment=Enum.TextYAlignment.Bottom,ZIndex=9})
+		-- Fast right-to-left streaks. They make the intro feel alive instead of looking like a static splash screen.
+		local streaks={}
+		for i=1,105 do
+			local y=math.random()
+			local length=math.random(18,110)
+			local thickness=math.random(1,3)
+			local streak=mk("Frame",root,{AnchorPoint=Vector2.new(1,0.5),BackgroundColor3=Color3.fromRGB(86+math.random(0,45),170+math.random(0,60),255),BackgroundTransparency=math.random(45,82)/100,BorderSizePixel=0,Position=UDim2.new(1+math.random(0,90)/100,0,y,0),Size=UDim2.fromOffset(length,thickness),Rotation=0,ZIndex=5})
+			streaks[#streaks+1]={Gui=streak,Speed=math.random(140,420),Delay=math.random()*2.5}
+		end
 
+		-- Small particles drift opposite the streaks so the background has depth instead of one flat motion layer.
 		local particles={}
-		for i=1,28 do
-			local d=mk("Frame",root,{AnchorPoint=Vector2.new(0.5,0.5),BackgroundColor3=Color3.fromRGB(74,165,235),BackgroundTransparency=math.random(45,85)/100,BorderSizePixel=0,Position=UDim2.fromScale(math.random(),math.random()),Size=UDim2.fromOffset(math.random(1,2),math.random(1,2)),ZIndex=4})
-			mk("UICorner",d,{CornerRadius=UDim.new(1,0)})
-			particles[#particles+1]=d
+		for i=1,48 do
+			local size=math.random(1,3)
+			local dot=mk("Frame",root,{BackgroundColor3=Color3.fromRGB(110,205,255),BackgroundTransparency=math.random(45,80)/100,BorderSizePixel=0,Position=UDim2.fromScale(math.random(),math.random()),Size=UDim2.fromOffset(size,size),ZIndex=4})
+			mk("UICorner",dot,{CornerRadius=UDim.new(1,0)})
+			particles[#particles+1]={Gui=dot,Speed=math.random(8,28),Phase=math.random()*6.28}
 		end
+
+		local scan=mk("Frame",root,{BackgroundColor3=Color3.fromRGB(90,190,255),BackgroundTransparency=0.82,BorderSizePixel=0,Position=UDim2.new(0,0,-0.12,0),Size=UDim2.new(1,0,0,2),ZIndex=6})
+		local scanGlow=mk("Frame",root,{BackgroundColor3=Color3.fromRGB(75,170,255),BackgroundTransparency=0.97,BorderSizePixel=0,Position=UDim2.new(0,0,-0.12,0),Size=UDim2.new(1,0,0,48),ZIndex=5})
+
+		local card = mk("Frame",root,{AnchorPoint=Vector2.new(0.5,0.5),BackgroundColor3=Color3.fromRGB(5,10,17),BackgroundTransparency=0.06,BorderSizePixel=0,Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(720,310),ZIndex=10})
+		mk("UICorner",card,{CornerRadius=UDim.new(0,8)})
+		mk("UIStroke",card,{Color=Color3.fromRGB(54,104,143),Thickness=1,Transparency=0.25})
+		local cardGlow=mk("Frame",card,{BackgroundColor3=Color3.fromRGB(67,165,255),BackgroundTransparency=0.96,BorderSizePixel=0,Position=UDim2.new(0,0,0,0),Size=UDim2.new(1,0,0,90),ZIndex=10})
+		mk("UICorner",cardGlow,{CornerRadius=UDim.new(0,8)})
+		local accent=mk("Frame",card,{BackgroundColor3=Color3.fromRGB(79,174,255),BorderSizePixel=0,Position=UDim2.fromOffset(0,0),Size=UDim2.new(0,3,1,0),ZIndex=12})
+		local eyebrow=mk("TextLabel",card,{BackgroundTransparency=1,Position=UDim2.fromOffset(30,25),Size=UDim2.new(1,-60,0,18),Font=Enum.Font.Code,Text="REAL DEX  //  BOOT SEQUENCE",TextColor3=Color3.fromRGB(94,172,225),TextSize=11,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=13})
+		local welcome=mk("TextLabel",card,{BackgroundTransparency=1,Position=UDim2.fromOffset(28,54),Size=UDim2.new(1,-56,0,76),Font=Enum.Font.GothamBlack,Text="Welcome, "..tostring(plr.DisplayName or plr.Name),TextColor3=Color3.fromRGB(241,248,255),TextSize=38,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=13})
+		local brand=mk("TextLabel",card,{BackgroundTransparency=1,Position=UDim2.fromOffset(31,112),Size=UDim2.new(1,-62,0,35),Font=Enum.Font.GothamBold,Text="to Real Dex  •  by Mistar Novier",TextColor3=Color3.fromRGB(105,193,255),TextSize=20,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=13})
+		local divider=mk("Frame",card,{BackgroundColor3=Color3.fromRGB(30,58,80),BorderSizePixel=0,Position=UDim2.fromOffset(30,160),Size=UDim2.new(1,-60,0,1),ZIndex=13})
+		local statusPrefix=mk("TextLabel",card,{BackgroundTransparency=1,Position=UDim2.fromOffset(30,180),Size=UDim2.fromOffset(65,20),Font=Enum.Font.Code,Text="STATUS",TextColor3=Color3.fromRGB(64,111,143),TextSize=10,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=13})
+		local status=mk("TextLabel",card,{BackgroundTransparency=1,Position=UDim2.fromOffset(94,180),Size=UDim2.new(1,-145,0,20),Font=Enum.Font.Code,Text=initStatus or "Initializing",TextColor3=Color3.fromRGB(205,226,242),TextSize=11,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=13})
+		local statusDot=mk("Frame",card,{BackgroundColor3=Color3.fromRGB(80,185,255),BorderSizePixel=0,Position=UDim2.new(1,-48,0,185),Size=UDim2.fromOffset(7,7),ZIndex=13})
+		mk("UICorner",statusDot,{CornerRadius=UDim.new(1,0)})
+		local barBack=mk("Frame",card,{BackgroundColor3=Color3.fromRGB(15,27,39),BorderSizePixel=0,Position=UDim2.fromOffset(30,217),Size=UDim2.new(1,-60,0,7),ZIndex=13})
+		mk("UICorner",barBack,{CornerRadius=UDim.new(1,0)})
+		local bar=mk("Frame",barBack,{BackgroundColor3=Color3.fromRGB(75,173,255),BorderSizePixel=0,Size=UDim2.new(0,0,1,0),ZIndex=14})
+		mk("UICorner",bar,{CornerRadius=UDim.new(1,0)})
+		local percent=mk("TextLabel",card,{BackgroundTransparency=1,Position=UDim2.fromOffset(30,235),Size=UDim2.fromOffset(60,18),Font=Enum.Font.Code,Text="000%",TextColor3=Color3.fromRGB(83,180,255),TextSize=10,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=13})
+		local detail=mk("TextLabel",card,{BackgroundTransparency=1,Position=UDim2.fromOffset(100,235),Size=UDim2.new(1,-130,0,18),Font=Enum.Font.Code,Text="REFLECTION  /  SCHEMA  /  RUNTIME",TextColor3=Color3.fromRGB(57,88,111),TextSize=9,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=13})
+		local footer=mk("TextLabel",card,{BackgroundTransparency=1,Position=UDim2.fromOffset(30,268),Size=UDim2.new(1,-60,0,18),Font=Enum.Font.Code,Text="REAL DEX 4.0  //  MISTAR NOVIER",TextColor3=Color3.fromRGB(57,90,113),TextSize=9,TextXAlignment=Enum.TextXAlignment.Left,ZIndex=13})
+
+		local logo=mk("Frame",root,{AnchorPoint=Vector2.new(0.5,0.5),BackgroundTransparency=1,Position=UDim2.fromScale(0.86,0.14),Size=UDim2.fromOffset(100,100),ZIndex=15})
+		local logoCore=mk("Frame",logo,{AnchorPoint=Vector2.new(0.5,0.5),BackgroundColor3=Color3.fromRGB(74,171,255),BackgroundTransparency=0.08,Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(13,13),ZIndex=16})
+		mk("UICorner",logoCore,{CornerRadius=UDim.new(1,0)})
+		local logoRing=mk("Frame",logo,{AnchorPoint=Vector2.new(0.5,0.5),BackgroundTransparency=1,Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(66,66),ZIndex=15})
+		mk("UICorner",logoRing,{CornerRadius=UDim.new(1,0)})
+		mk("UIStroke",logoRing,{Color=Color3.fromRGB(77,169,244),Thickness=1.5,Transparency=0.2})
+		local logoRing2=mk("Frame",logo,{AnchorPoint=Vector2.new(0.5,0.5),BackgroundTransparency=1,Position=UDim2.fromScale(0.5,0.5),Size=UDim2.fromOffset(88,88),ZIndex=15})
+		mk("UICorner",logoRing2,{CornerRadius=UDim.new(1,0)})
+		mk("UIStroke",logoRing2,{Color=Color3.fromRGB(91,192,255),Thickness=1,Transparency=0.55})
 
 		local blur
 		pcall(function()
-			blur=Instance.new("BlurEffect"); blur.Name="RealDexIntroBlur"; blur.Size=0; blur.Parent=service.Lighting
-			tweenS:Create(blur,TweenInfo.new(0.65,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{Size=14}):Play()
+			blur=Instance.new("BlurEffect")
+			blur.Name="RealDexIntroBlur"
+			blur.Size=0
+			blur.Parent=service.Lighting
+			tweenS:Create(blur,TweenInfo.new(0.7,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{Size=16}):Play()
 		end)
 
 		local alive=true
@@ -15987,34 +15990,42 @@ Main = (function()
 		connect(runService.RenderStepped,function(dt)
 			if not alive or not gui.Parent then return end
 			t += dt
-			coreRing.Rotation=t*18
-			coreRing2.Rotation=-t*31
-			coreText.TextTransparency=0.05+math.sin(t*4)*0.05
-			statusDot.BackgroundTransparency=0.15+math.abs(math.sin(t*3))*0.45
-			cursor.Size=UDim2.fromOffset(24+math.abs(math.sin(t*5))*38,2)
-			for i,seg in ipairs(orbit) do seg.BackgroundTransparency=0.18+((math.sin(t*3+i*0.55)+1)/2)*0.65 end
-			for i,d in ipairs(particles) do d.Position=UDim2.new(d.Position.X.Scale,(i%2==0 and 1 or -1)*math.sin(t*0.35+i)*2,d.Position.Y.Scale,math.cos(t*0.45+i)*2) end
-			barGlow.Position=UDim2.new(math.clamp(currentProgress,0,1),-3,0,-2)
+			logoRing.Rotation=t*70
+			logoRing2.Rotation=-t*42
+			logoCore.Size=UDim2.fromOffset(12+math.abs(math.sin(t*4))*6,12+math.abs(math.sin(t*4))*6)
+			statusDot.BackgroundTransparency=0.1+math.abs(math.sin(t*5))*0.55
+			backGlow.Size=UDim2.fromOffset(650+math.sin(t*1.2)*45,650+math.sin(t*1.2)*45)
+			backGlow2.Size=UDim2.fromOffset(380+math.sin(t*1.7)*30,380+math.sin(t*1.7)*30)
+			for i,st in ipairs(streaks) do
+				local g=st.Gui
+				local x=g.Position.X.Scale-(st.Speed*dt/1000)
+				if x < -0.18 then
+					x=1.02+math.random()*0.65
+					g.Position=UDim2.new(x,0,math.random(),0)
+				else
+					g.Position=UDim2.new(x,0,g.Position.Y.Scale,0)
+				end
+				if i%5==0 then g.BackgroundTransparency=0.25+math.abs(math.sin(t*4+i))*0.5 end
+			end
+			for i,particle in ipairs(particles) do
+				local g=particle.Gui
+				local x=g.Position.X.Scale + particle.Speed*dt/1000
+				if x > 1.08 then x=-0.05 end
+				g.Position=UDim2.new(x,0,g.Position.Y.Scale,g.Position.Y.Offset)
+				g.BackgroundTransparency=0.45+math.abs(math.sin(t*2+particle.Phase))*0.45
+			end
+			local sy=-0.12+(t%4.2)/4.2*1.24
+			scan.Position=UDim2.new(0,0,sy,0)
+			scanGlow.Position=UDim2.new(0,0,sy-0.025,0)
+			cardGlow.BackgroundTransparency=0.93+math.abs(math.sin(t*1.8))*0.035
 		end)
 
-		tweenS:Create(topLine,TweenInfo.new(1.0,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{Size=UDim2.new(1,0,0,2)}):Play()
-		panel.Position=UDim2.new(-0.5,0,0.5,0)
-		core.Position=UDim2.fromScale(1.18,0.5)
-		tweenS:Create(panel,TweenInfo.new(0.8,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{Position=UDim2.fromScale(0.09,0.5)}):Play()
-		tweenS:Create(core,TweenInfo.new(0.9,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Position=UDim2.fromScale(0.78,0.5)}):Play()
-		panel.BackgroundTransparency=1; title.TextTransparency=1; subtitle.TextTransparency=1; status.TextTransparency=1; eyebrow.TextTransparency=1
-		tweenS:Create(panel,TweenInfo.new(0.7),{BackgroundTransparency=0.04}):Play()
-		for _,label in ipairs({eyebrow,title,subtitle,status}) do tweenS:Create(label,TweenInfo.new(0.55,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{TextTransparency=0}):Play() end
-
-		local function setProgress(text,n)
+		local function setProgress(textValue,value)
 			if not alive then return end
-			n=math.clamp(tonumber(n) or currentProgress,0,1)
-			currentProgress=math.max(currentProgress,n)
-			status.Text=tostring(text or "Loading")
+			currentProgress=math.clamp(tonumber(value) or 0,0,1)
+			status.Text=tostring(textValue or "Working")
 			percent.Text=string.format("%03d%%",math.floor(currentProgress*100+0.5))
-			detail.Text=(currentProgress < 0.34 and "SCHEMA / NETWORK / CACHE") or (currentProgress < 0.68 and "REFLECTION / CLASS INDEX") or "RUNTIME / UI / READY"
-			telemetryText.Text=string.format("MEM  %.1f%%     API  %s     NET  READY\nREFLECTION DATABASE  /  %s",math.random(10,39)/10,currentProgress>0.5 and "LIVE" or "WAIT",tostring(text or "WORKING"):upper())
-			tweenS:Create(bar,TweenInfo.new(0.4,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{Size=UDim2.new(currentProgress,0,1,0)}):Play()
+			tweenS:Create(bar,TweenInfo.new(0.32,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{Size=UDim2.new(currentProgress,0,1,0)}):Play()
 		end
 
 		local function close()
@@ -16023,8 +16034,9 @@ Main = (function()
 			for _,c in ipairs(connections) do pcall(function() c:Disconnect() end) end
 			connections={}
 			setProgress("SYSTEM READY",1)
-			tweenS:Create(panel,TweenInfo.new(0.5,Enum.EasingStyle.Quart,Enum.EasingDirection.In),{Position=UDim2.new(-0.55,0,0.5,0),BackgroundTransparency=1}):Play()
-			tweenS:Create(core,TweenInfo.new(0.55,Enum.EasingStyle.Quart,Enum.EasingDirection.In),{Position=UDim2.new(1.22,0,0.5,0)}):Play()
+			if Main.ActiveIntro and Main.ActiveIntro.Object==gui then Main.ActiveIntro=nil end
+			tweenS:Create(card,TweenInfo.new(0.55,Enum.EasingStyle.Quart,Enum.EasingDirection.In),{Position=UDim2.new(0.5,0,0.58,0),BackgroundTransparency=1}):Play()
+			tweenS:Create(logo,TweenInfo.new(0.55,Enum.EasingStyle.Back,Enum.EasingDirection.In),{Position=UDim2.new(1.15,0,-0.1,0)}):Play()
 			tweenS:Create(topLine,TweenInfo.new(0.45),{Size=UDim2.new(0,0,0,2)}):Play()
 			if blur then
 				tweenS:Create(blur,TweenInfo.new(0.55,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{Size=0}):Play()
@@ -16033,6 +16045,9 @@ Main = (function()
 			task.delay(0.62,function() pcall(function() gui:Destroy() end) end)
 		end
 
+		tweenS:Create(card,TweenInfo.new(0.7,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{Position=UDim2.fromScale(0.5,0.5)}):Play()
+		tweenS:Create(logo,TweenInfo.new(0.8,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Position=UDim2.fromScale(0.86,0.14)}):Play()
+		tweenS:Create(topLine,TweenInfo.new(0.9,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{Size=UDim2.new(1,0,0,2)}):Play()
 		setProgress(initStatus or "Initializing",0)
 		return {SetProgress=setProgress,Close=close,Object=gui}
 	end
@@ -16181,6 +16196,70 @@ Main = (function()
 		Main.AppTemplate = gui.App
 		Main.MainGuiOpen = false
 
+		-- Small control strip. Keep reload/deload out of the app grid so they are always reachable.
+		local actionBar = Instance.new("Frame")
+		actionBar.Name = "ActionBar"
+		actionBar.BackgroundColor3 = Settings.Theme.Main2 or Color3.fromRGB(34,34,34)
+		actionBar.BorderSizePixel = 0
+		actionBar.Position = UDim2.fromOffset(4,4)
+		actionBar.Size = UDim2.new(1,-8,0,28)
+		actionBar.Parent = gui.OpenButton.MainFrame
+		local actionStroke = Instance.new("UIStroke")
+		actionStroke.Color = Settings.Theme.Line or Color3.fromRGB(55,70,82)
+		actionStroke.Transparency = 0.35
+		actionStroke.Parent = actionBar
+
+		local function makeAction(text,x,accentColor)
+			local b = Instance.new("TextButton")
+			b.AutoButtonColor = false
+			b.BackgroundColor3 = Settings.Theme.Button or Color3.fromRGB(42,42,42)
+			b.BackgroundTransparency = 0.1
+			b.BorderSizePixel = 0
+			b.Position = UDim2.fromOffset(x,3)
+			b.Size = UDim2.fromOffset(82,22)
+			b.Font = Enum.Font.Code
+			b.Text = text
+			b.TextColor3 = accentColor
+			b.TextSize = 11
+			b.Parent = actionBar
+			local c=Instance.new("UICorner"); c.CornerRadius=UDim.new(0,3); c.Parent=b
+			b.MouseEnter:Connect(function()
+				service.TweenService:Create(b,TweenInfo.new(0.12),{BackgroundColor3=accentColor,BackgroundTransparency=0.75}):Play()
+			end)
+			b.MouseLeave:Connect(function()
+				service.TweenService:Create(b,TweenInfo.new(0.12),{BackgroundColor3=Settings.Theme.Button or Color3.fromRGB(42,42,42),BackgroundTransparency=0.1}):Play()
+			end)
+			return b
+		end
+
+		local reloadButton = makeAction("RELOAD",4,Color3.fromRGB(92,184,255))
+		local deloadButton = makeAction("DELOAD",90,Color3.fromRGB(255,116,116))
+		local buildLabel = Instance.new("TextLabel")
+		buildLabel.BackgroundTransparency=1
+		buildLabel.Position=UDim2.new(1,-125,0,0)
+		buildLabel.Size=UDim2.fromOffset(120,28)
+		buildLabel.Font=Enum.Font.Code
+		buildLabel.Text="RDX 4.0  //  ONLINE"
+		buildLabel.TextColor3=Color3.fromRGB(74,105,125)
+		buildLabel.TextSize=9
+		buildLabel.TextXAlignment=Enum.TextXAlignment.Right
+		buildLabel.Parent=actionBar
+
+		-- The app grid starts below the control strip.
+		gui.OpenButton.MainFrame.AppsFrame.Position = UDim2.new(0.5,0,0,36)
+		gui.OpenButton.MainFrame.AppsFrame.Size = UDim2.new(0,222,1,-61)
+
+		reloadButton.MouseButton1Click:Connect(function()
+			if Main.ReloadLatest then
+				Main.ReloadLatest()
+			end
+		end)
+		deloadButton.MouseButton1Click:Connect(function()
+			if Main.Uninit then
+				Main.Uninit()
+			end
+		end)
+
 		local openButton = gui.OpenButton
 		openButton.BackgroundTransparency = 0.2
 		openButton.MainFrame.Size = UDim2.new(0,0,0,0)
@@ -16312,19 +16391,25 @@ Main = (function()
 
 	Main.Init = function()
 		Main.Elevated = pcall(function() local a = game:GetService("CoreGui"):GetFullName() end)
-		
+	
+		-- Put the boot UI up before the environment/filesystem/API/module work starts.
+		local intro = Main.CreateIntro("BOOTING REAL DEX")
+		Main.ActiveIntro = intro
+		intro.SetProgress("Preparing interface",0.02)
+
 		-- saves new settings if does not exist
 		if isfile and not isfile("RealDexSettings.json") then
 			Main.SaveCurrentSettings()
 		end
 		
 		Main.InitEnv()
+
 		Main.LoadSettings() -- loads the settings before init
 		
 		Main.SetupFilesystem()
 
 		-- Load Lib
-		local intro = Main.CreateIntro("Initializing Library")
+		intro.SetProgress("Loading interface core",0.08)
 		Lib = Main.LoadModule("Lib")
 		Lib.FastWait()
 
@@ -16453,20 +16538,77 @@ Main = (function()
 	end
 	
 	Main.Uninit = function()
+		if Main.ActiveIntro then
+			pcall(function() Main.ActiveIntro.Close() end)
+			Main.ActiveIntro=nil
+		end
+		if Main.MainGuiMouseEvent then
+			pcall(function() Main.MainGuiMouseEvent:Disconnect() end)
+			Main.MainGuiMouseEvent=nil
+		end
+		Main.MainGuiOpen=false
+		-- Hide known windows first so their internal tweens stop touching destroyed UI.
+		for _, control in pairs(Main.MenuApps or {}) do
+			pcall(function() if control.Disable then control.Disable(true) end end)
+		end
 		Main.MenuApps = {}
 		Main.AppControls = {}
 		Main.Plugins = {}
-		for _, gui in pairs(Main.GetSecureContainer():GetChildren()) do
-			if string.sub(gui.Name,1,5) == "_RDX_" then -- old prefix. this cleanup exists because stale GUIs are annoying
-				gui:Destroy()
+		pcall(function()
+			for _, gui in pairs(Main.GetSecureContainer():GetChildren()) do
+				if string.sub(gui.Name,1,5) == "_RDX_" then
+					pcall(function() gui:Destroy() end)
+				end
 			end
-		end
+		end)
+		pcall(function()
+			local b=service.Lighting:FindFirstChild("RealDexIntroBlur")
+			if b then b:Destroy() end
+		end)
+		Main.MainGui=nil
+		Main.AppsFrame=nil
+		Main.AppsContainer=nil
+		Main.AppsContainerGrid=nil
+		Main.AppTemplate=nil
 	end
 
 	Main.Reinit = function()
 		Main.Uninit()
 		task.wait()
 		Main.Init()
+	end
+
+	Main.ReloadLatest = function()
+		if Main.Reloading then return end
+		Main.Reloading=true
+		local url="https://raw.githubusercontent.com/huneterthefirst/Real-Dex/refs/heads/main/Real-Dex.luau"
+		local loader = env and env.loadstring or loadstring
+		local ok,source = pcall(function()
+			return oldgame:HttpGet(url.."?v="..tostring(tick()),true)
+		end)
+		if not ok or type(source)~="string" or source=="" then
+			Main.Reloading=false
+			warn("[Real Dex] Reload failed: could not fetch latest source")
+			return
+		end
+		if type(loader)~="function" then
+			Main.Reloading=false
+			warn("[Real Dex] Reload failed: loadstring is unavailable")
+			return
+		end
+		Main.Uninit()
+		task.wait()
+		local chunkOk,chunk = pcall(loader,source,"RealDexLatest")
+		if not chunkOk or type(chunk)~="function" then
+			Main.Reloading=false
+			warn("[Real Dex] Reload failed while compiling latest source: ",chunk)
+			return
+		end
+		task.spawn(function()
+			local runOk,runErr=pcall(chunk)
+			if not runOk then warn("[Real Dex] Latest build failed: ",runErr) end
+		end)
+		Main.Reloading=false
 	end
 
 	return Main
