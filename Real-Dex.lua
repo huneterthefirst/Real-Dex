@@ -4,7 +4,7 @@
 	
 	By Mistar Novier
 	
-	Real Dex is a modern debugging and inspection build. The old UI fought back, so I stopped asking nicely.
+	Real Dex is where you poke around, inspect stuff, and see what is actually going on.
 ]]
 
 local selection
@@ -897,7 +897,7 @@ local function main()
 	local addObject,removeObject,moveObject = nil,nil,nil
 
 	local iconData
-	local remote_blocklist = {} -- list of remotes beng blocked, k = the remote instance, v = their old function :3
+	local remote_blocklist = {} -- Remotes currently blocked by the local call filter.
 	nodes = nodes or {}
 
 	addObject = function(root)
@@ -3315,7 +3315,7 @@ return search]==]
 			iconData = Lib.IconMap.getIconDataFromName(Settings.ClassIcon)
 			
 			Explorer.ClassIcons = Lib.IconMap.new("rbxassetid://"..tostring(iconData.MapId), iconData.IconSize * iconData.Witdh, iconData.IconSize * iconData.Height,iconData.IconSize,iconData.IconSize)
-			-- move every value dict 1 behind because SetDict starts at 0 not 1 lol
+			-- Shift dictionary values because SetDict uses zero-based indexing.
 			local fixed = {}
 			for i,v in pairs(iconData.Icons) do
 				fixed[i] = v - 1
@@ -6043,7 +6043,7 @@ local function main()
 				{7,"TextButton",{AutoButtonColor=false,BackgroundColor3=Color3.new(0.12549020349979,0.12549020349979,0.12549020349979),BackgroundTransparency=1,BorderSizePixel=0,Font=3,Name="Close",Parent={5},Position=UDim2.new(1,-18,0,2),Size=UDim2.new(0,16,0,16),Text="",TextColor3=Color3.new(1,1,1),TextSize=14,}},
 				{8,"ImageLabel",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Image="rbxassetid://5054663650",Parent={7},Position=UDim2.new(0,3,0,3),Size=UDim2.new(0,10,0,10),}},
 				{9,"UICorner",{CornerRadius=UDim.new(0,4),Parent={7},}},
-				--[[lol mod]]	{9,"UICorner",{CornerRadius=UDim.new(0,4),Parent={2},}},
+				{9,"UICorner",{CornerRadius=UDim.new(0,4),Parent={2},}},
 				{10,"TextButton",{AutoButtonColor=false,BackgroundColor3=Color3.new(0.12549020349979,0.12549020349979,0.12549020349979),BackgroundTransparency=1,BorderSizePixel=0,Font=3,Name="Minimize",Parent={5},Position=UDim2.new(1,-36,0,2),Size=UDim2.new(0,16,0,16),Text="",TextColor3=Color3.new(1,1,1),TextSize=14,}},
 				{11,"ImageLabel",{BackgroundColor3=Color3.new(1,1,1),BackgroundTransparency=1,Image="rbxassetid://5034768003",Parent={10},Position=UDim2.new(0,3,0,3),Size=UDim2.new(0,10,0,10),}},
 				{12,"UICorner",{CornerRadius=UDim.new(0,4),Parent={10},}},
@@ -6769,7 +6769,7 @@ local function main()
 				else
 					if table.find(visibleWindows,window) then return end
 
-					-- TODO: make better
+	
 					window.GuiElems.Main.Size = UDim2.new(0,window.SizeX,0,20)
 					local ti = TweenInfo.new(0.2,Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
 					window:StopTweens()
@@ -10758,7 +10758,7 @@ end,
 --[[
 	Model Viewer App Module
 	
-	A model viewer :3
+	A model viewer.
 ]]
 
 -- all the module locals. yes, there are too many.
@@ -13307,10 +13307,64 @@ local function main()
 				if cok and type(connections)=="table" then
 					add(name.."  ·  "..tostring(#connections).." connection(s)",true)
 					for index,con in ipairs(connections) do
-						total=total+1; local info=Properties.GetConnectionInfo(con); local lines={"#"..index.."  "..(info.Enabled==nil and "state: ?" or (info.Enabled and "enabled" or "disabled"))}
+						total=total+1
+						local info=Properties.GetConnectionInfo(con)
+						local card=Instance.new("Frame")
+						card.BackgroundColor3=Settings.Theme.Main2
+						card.BorderSizePixel=0
+						card.Size=UDim2.new(1,-4,0,76)
+						card.Parent=body
+						local text=Instance.new("TextLabel")
+						text.BackgroundTransparency=1
+						text.Position=UDim2.fromOffset(10,8)
+						text.Size=UDim2.new(1,-112,1,-16)
+						text.TextXAlignment=Enum.TextXAlignment.Left
+						text.TextYAlignment=Enum.TextYAlignment.Top
+						text.TextWrapped=true
+						text.Font=Enum.Font.SourceSans
+						text.TextSize=13
+						text.TextColor3=Settings.Theme.Text
+						local lines={"#"..index.."  "..(info.Enabled==nil and "state: ?" or (info.Enabled and "enabled" or "disabled"))}
 						if info.Script then lines[#lines+1]="Script: "..info.Script:GetFullName() elseif info.Source then lines[#lines+1]="Source: "..tostring(info.Source)..(info.Line and (":"..tostring(info.Line)) or "") else lines[#lines+1]="Script: unavailable from this connection object" end
 						if info.Name and tostring(info.Name)~="" then lines[#lines+1]="Callback: "..tostring(info.Name) end
-						add(table.concat(lines,"\n"))
+						text.Text=table.concat(lines,"\n")
+						text.Parent=card
+						local disconnect=Instance.new("TextButton")
+						disconnect.BackgroundColor3=Settings.Theme.Main3 or Settings.Theme.Main2
+						disconnect.BorderSizePixel=0
+						disconnect.Position=UDim2.new(1,-92,0,22)
+						disconnect.Size=UDim2.fromOffset(82,30)
+						disconnect.Font=Enum.Font.SourceSansBold
+						disconnect.TextSize=12
+						disconnect.TextColor3=Settings.Theme.Text
+						disconnect.Text="Disconnect"
+						disconnect.AutoButtonColor=true
+						disconnect.Parent=card
+						local function safeCall(obj, method)
+						    if typeof(obj[method]) == "function" then
+						        return pcall(obj[method], obj)
+						    end
+						    return false
+						end
+						
+						disconnect.MouseButton1Click:Connect(function()
+						    local success = false
+						
+						    if typeof(con.Disconnect) == "function" then
+						        success = pcall(con.Disconnect, con)
+						    elseif typeof(con.disconnect) == "function" then
+						        success = pcall(con.disconnect, con)
+						    end
+						
+						    if success then
+						        disconnect.Text = "Disconnected"
+						        disconnect.Active = false
+						        disconnect.AutoButtonColor = false
+						        disconnect.TextColor3 = Color3.fromRGB(150, 150, 150)
+						    else
+						        disconnect.Text = "Failed"
+						    end
+						end)
 					end
 				end
 			end
@@ -13548,7 +13602,7 @@ local function main()
 		Properties.FullNameFrameAttach = Lib.AttachTo(fullNameFrame)
 	end
 
-	Properties.Init = function() -- TODO: MAKE BETTER
+	Properties.Init = function()
 		local guiItems = create({
 			{1,"Folder",{Name="Items",}},
 			{2,"Frame",{BackgroundColor3=Color3.new(0.20392157137394,0.20392157137394,0.20392157137394),BorderSizePixel=0,Name="ToolBar",Parent={1},Size=UDim2.new(1,0,0,22),}},
@@ -16335,10 +16389,12 @@ Main = (function()
 		openButton.MainFrame.BottomFrame.Information.MouseButton1Click:Connect(function()
 			local duration = 1
 			local Infos = {
-				"Contributors >>",
-				"Toon (IY Dex and PRs)",
-				"Moon (Dex)",
-				"Cazan (3D Preview)",
+				"Real Dex",
+				"By Mistar Novier",
+				"Reflection and schema tools",
+				"Explorer and property inspection",
+				"Built from the original Dex project",
+				"Original contributors: Moon, Toon, Cazan",
 			}
 			
 			if isInfoCD then return end
