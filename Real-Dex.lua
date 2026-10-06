@@ -16677,7 +16677,7 @@ Main = (function()
 	Main.ReloadLatest = function()
 		if Main.Reloading then return end
 		Main.Reloading=true
-		local url="https://raw.githubusercontent.com/huneterthefirst/Real-Dex/refs/heads/main/Real-Dex.luau"
+		local url="https://raw.githubusercontent.com/huneterthefirst/Real-Dex/refs/heads/main/Real-Dex.lua"
 		local loader = env and env.loadstring or loadstring
 		local ok,source = pcall(function()
 			return oldgame:HttpGet(url.."?v="..tostring(tick()),true)
