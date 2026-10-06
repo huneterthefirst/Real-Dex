@@ -4,7 +4,7 @@
 	
 	By Mistar Novier
 	
-	Real Dex is a modern debugging and inspection build. The old UI fought back, so I stopped asking nicely.
+	Real Dex is a modern debugging and inspection build and other bs RECOMMEND using "Real" executor
 ]]
 
 local selection
@@ -11302,7 +11302,7 @@ local function main()
 	}
 
 
-	-- Dynamic reflection metadata.  This supplements Dex's bundled API data
+	-- Dynamic reflection metadata. This supplements the bundled API data
 	-- without bypassing Roblox's normal property security boundary.
 	Properties.Reflection = {
 		URL = "https://raw.githubusercontent.com/MaximumADHD/Roblox-Client-Tracker/roblox/Full-API-Dump.json",
@@ -11395,7 +11395,7 @@ local function main()
 		if Properties.Reflection.Loaded then return true end
 		local raw
 		local source = "none"
-		local cachePath = "dex/full_api_dump.json"
+		local cachePath = "RD/full_api_dump.json"
 
 		pcall(function()
 			if env and env.readfile then raw = env.readfile(cachePath) source = "cache" end
@@ -13189,192 +13189,128 @@ local function main()
 		return info
 	end
 
+	local function ModernPanel(parent, color, radius)
+		local f=Instance.new("Frame")
+		f.BackgroundColor3=color or Settings.Theme.Main2
+		f.BorderSizePixel=0
+		f.Parent=parent
+		local c=Instance.new("UICorner"); c.CornerRadius=UDim.new(0,radius or 8); c.Parent=f
+		local st=Instance.new("UIStroke"); st.Color=Settings.Theme.Outline2; st.Transparency=.35; st.Thickness=1; st.Parent=f
+		return f
+	end
+	local function ModernButton(parent,text,x,accent)
+		local b=Instance.new("TextButton")
+		b.AutoButtonColor=false; b.BackgroundColor3=accent and Settings.Theme.Accent or Settings.Theme.Button
+		b.BorderSizePixel=0; b.Position=x; b.Size=UDim2.new(0,112,0,28); b.Font=Enum.Font.GothamMedium; b.TextSize=12
+		b.TextColor3=Settings.Theme.Text; b.Text=text; b.Parent=parent
+		local c=Instance.new("UICorner"); c.CornerRadius=UDim.new(0,6); c.Parent=b
+		b.MouseEnter:Connect(function() b.BackgroundColor3=accent and Settings.Theme.AccentHover or Settings.Theme.ButtonHover end)
+		b.MouseLeave:Connect(function() b.BackgroundColor3=accent and Settings.Theme.Accent or Settings.Theme.Button end)
+		return b
+	end
+	local function ModernTitle(parent,text,sub)
+		local title=Instance.new("TextLabel"); title.BackgroundTransparency=1; title.Position=UDim2.new(0,14,0,10); title.Size=UDim2.new(1,-28,0,24); title.Font=Enum.Font.GothamBold; title.TextSize=17; title.TextColor3=Settings.Theme.Text; title.TextXAlignment=Enum.TextXAlignment.Left; title.Text=text; title.Parent=parent
+		if sub then local s=Instance.new("TextLabel"); s.BackgroundTransparency=1; s.Position=UDim2.new(0,14,0,34); s.Size=UDim2.new(1,-28,0,22); s.Font=Enum.Font.Gotham; s.TextSize=11; s.TextColor3=Settings.Theme.SubText; s.TextXAlignment=Enum.TextXAlignment.Left; s.Text=sub; s.Parent=parent end
+		return title
+	end
+	local function ModernRow(parent,text,kind,detail)
+		local row=ModernPanel(parent,Settings.Theme.Main1,7); row.Size=UDim2.new(1,-8,0,detail and 66 or 42)
+		local k=Instance.new("TextLabel"); k.BackgroundTransparency=1; k.Position=UDim2.new(0,12,0,7); k.Size=UDim2.new(0,105,0,18); k.Font=Enum.Font.GothamBold; k.TextSize=10; k.TextColor3=Settings.Theme.Accent; k.TextXAlignment=Enum.TextXAlignment.Left; k.Text=kind:upper(); k.Parent=row
+		local n=Instance.new("TextLabel"); n.BackgroundTransparency=1; n.Position=UDim2.new(0,118,0,6); n.Size=UDim2.new(1,-130,0,20); n.Font=Enum.Font.GothamMedium; n.TextSize=13; n.TextColor3=Settings.Theme.Text; n.TextXAlignment=Enum.TextXAlignment.Left; n.Text=n.Text=="" and text or text; n.Parent=row
+		if detail then local d=Instance.new("TextLabel"); d.BackgroundTransparency=1; d.Position=UDim2.new(0,118,0,29); d.Size=UDim2.new(1,-130,0,30); d.Font=Enum.Font.Gotham; d.TextSize=10; d.TextColor3=Settings.Theme.SubText; d.TextWrapped=true; d.TextXAlignment=Enum.TextXAlignment.Left; d.TextYAlignment=Enum.TextYAlignment.Top; d.Text=detail; d.Parent=row end
+		return row
+	end
+
 	Properties.ShowSchemaInspector = function(obj)
 		if not obj then return end
 		if not Properties.Reflection.Loaded then pcall(Properties.Reflection.Load) end
-		local className = obj.ClassName
-		local inspector = Properties.SchemaInspector
+		local inspector=Properties.SchemaInspector
 		if not inspector then
-			local win = Lib.Window.new(); win:SetTitle("Class Schema"); win:Resize(860,600)
-			local root = Instance.new("Frame"); root.BackgroundTransparency=1; root.Size=UDim2.new(1,0,1,0); root.Parent=win.GuiElems.Content
-			local header = Instance.new("TextLabel"); header.BackgroundTransparency=1; header.Position=UDim2.new(0,8,0,5); header.Size=UDim2.new(1,-16,0,27); header.TextColor3=Settings.Theme.Text; header.TextXAlignment=Enum.TextXAlignment.Left; header.Font=Enum.Font.SourceSansBold; header.TextSize=17; header.Parent=root
-			local meta = Instance.new("TextLabel"); meta.BackgroundTransparency=1; meta.Position=UDim2.new(0,8,0,31); meta.Size=UDim2.new(1,-16,0,38); meta.TextColor3=Settings.Theme.SubText or Settings.Theme.Text; meta.TextXAlignment=Enum.TextXAlignment.Left; meta.TextYAlignment=Enum.TextYAlignment.Top; meta.Font=Enum.Font.SourceSans; meta.TextSize=13; meta.TextWrapped=true; meta.Parent=root
-			local search = Instance.new("TextBox"); search.BackgroundColor3=Settings.Theme.Main2; search.BorderSizePixel=0; search.Position=UDim2.new(0,8,0,70); search.Size=UDim2.new(1,-16,0,24); search.ClearTextOnFocus=false; search.PlaceholderText="Search properties, events, callbacks, functions..."; search.Text=""; search.TextColor3=Settings.Theme.Text; search.PlaceholderColor3=Settings.Theme.SubText or Settings.Theme.Text; search.TextSize=13; search.Font=Enum.Font.SourceSans; search.TextXAlignment=Enum.TextXAlignment.Left; search.Parent=root
-			local body = Instance.new("ScrollingFrame"); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.Position=UDim2.new(0,6,0,100); body.Size=UDim2.new(1,-12,1,-106); body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.CanvasSize=UDim2.new(); body.ScrollBarThickness=7; body.Parent=root
-			local layout=Instance.new("UIListLayout"); layout.Padding=UDim.new(0,4); layout.Parent=body
-			inspector={Window=win,Header=header,Meta=meta,Search=search,Body=body}; Properties.SchemaInspector=inspector
-			search:GetPropertyChangedSignal("Text"):Connect(function() if Properties.SchemaInspector and Properties.SchemaInspector.Object then Properties.ShowSchemaInspector(Properties.SchemaInspector.Object) end end)
+			local win=Lib.Window.new(); win:SetTitle("Real Dex  •  Class Schema"); win:Resize(940,650)
+			local root=Instance.new("Frame"); root.BackgroundColor3=Settings.Theme.Main1; root.BorderSizePixel=0; root.Size=UDim2.new(1,0,1,0); root.Parent=win.GuiElems.Content
+			local top=ModernPanel(root,Settings.Theme.Main2,10); top.Position=UDim2.new(0,8,0,8); top.Size=UDim2.new(1,-16,0,92)
+			local header=ModernTitle(top,"Class Schema","Live reflection database  •  inherited members included")
+			local search=Instance.new("TextBox"); search.BackgroundColor3=Settings.Theme.TextBox; search.BorderSizePixel=0; search.Position=UDim2.new(0,14,0,57); search.Size=UDim2.new(1,-28,0,26); search.ClearTextOnFocus=false; search.PlaceholderText="Search members  •  try idle, character, callback..."; search.TextColor3=Settings.Theme.Text; search.PlaceholderColor3=Settings.Theme.SubText; search.Font=Enum.Font.Gotham; search.TextSize=11; search.TextXAlignment=Enum.TextXAlignment.Left; search.Parent=top; local sc=Instance.new("UICorner"); sc.CornerRadius=UDim.new(0,6); sc.Parent=search
+			local tabs=ModernPanel(root,Settings.Theme.Main2,8); tabs.Position=UDim2.new(0,8,0,108); tabs.Size=UDim2.new(1,-16,0,38)
+			local body=Instance.new("ScrollingFrame"); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.Position=UDim2.new(0,8,0,154); body.Size=UDim2.new(1,-16,1,-162); body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.CanvasSize=UDim2.new(); body.ScrollBarThickness=5; body.ScrollBarImageColor3=Settings.Theme.Accent; body.Parent=root; local layout=Instance.new("UIListLayout"); layout.Padding=UDim.new(0,6); layout.Parent=body
+			inspector={Window=win,Root=root,Header=header,Search=search,Tabs=tabs,Body=body,Filter="All",Object=nil}; Properties.SchemaInspector=inspector
+			for _,filter in ipairs({"All","Properties","Events","Callbacks","Functions"}) do local b=ModernButton(tabs,filter,UDim2.new(0,(table.find({"All","Properties","Events","Callbacks","Functions"},filter)-1)*118,0,5),filter=="All"); b.Size=UDim2.new(0,108,0,28); b.MouseButton1Click:Connect(function() inspector.Filter=filter; Properties.ShowSchemaInspector(inspector.Object) end) end
+			search:GetPropertyChangedSignal("Text"):Connect(function() if inspector.Object then Properties.ShowSchemaInspector(inspector.Object) end end)
 		end
 		inspector.Object=obj
-		local body=inspector.Body
-		for _,child in ipairs(body:GetChildren()) do if child:IsA("GuiObject") then child:Destroy() end end
+		for _,child in ipairs(inspector.Body:GetChildren()) do if child:IsA("GuiObject") then child:Destroy() end end
 		local path=obj:GetFullName(); pcall(function() if Explorer.GetInstancePath then path=Explorer.GetInstancePath(obj) end end)
-		local results,schema=Properties.Reflection.SearchSchema(className,inspector.Search.Text)
-		inspector.Header.Text=className.."  ·  Live Class Schema"
-		inspector.Meta.Text="Instance: "..path.."\nSource: "..tostring(Properties.Reflection.Source).."  ·  Inheritance: "..table.concat(schema.Chain,"  <  ")
-		local counts={Property=0,Event=0,Callback=0,Function=0}
-		for _,item in ipairs(results) do counts[item.Kind]=(counts[item.Kind] or 0)+1 end
-		local function add(text,bold)
-			local label=Instance.new("TextLabel"); label.BackgroundColor3=Settings.Theme.Main2; label.BorderSizePixel=0; label.Size=UDim2.new(1,-4,0,24); label.AutomaticSize=Enum.AutomaticSize.Y; label.TextWrapped=true; label.TextXAlignment=Enum.TextXAlignment.Left; label.TextYAlignment=Enum.TextYAlignment.Top; label.Font=bold and Enum.Font.SourceSansBold or Enum.Font.SourceSans; label.TextSize=bold and 14 or 13; label.TextColor3=Settings.Theme.Text; label.Text=text; label.Parent=body
-		end
-	add(string.format("MATCHES  ·  %d  |  Properties %d  ·  Events %d  ·  Callbacks %d  ·  Functions %d",#results,counts.Property,counts.Event,counts.Callback,counts.Function),true)
-	for _,item in ipairs(results) do
-			local member=item.Member
-			local line=item.Kind.."  "..item.Name
-			if item.Kind=="Property" then
-				local tags={}; for tag in pairs(member.Tags or {}) do tags[#tags+1]=tostring(tag) end; table.sort(tags)
-				local ok,val=pcall(function() return obj[item.Name] end); local actual=ok and tostring(val) or "<unavailable>"; if #actual>180 then actual=actual:sub(1,177).."..." end
-				line=line.."  :  "..tostring(member.ValueType and member.ValueType.Name or "unknown").."  ·  "..Properties.Reflection.GetBadge(member).."\nActual: "..actual
-				if member.Security and member.Security~="None" then line=line.."\nSecurity: "..tostring(member.Security) end
-				if #tags>0 then line=line.."\nTags: "..table.concat(tags,", ") end
-			elseif item.Kind=="Event" then
-				local ok,signal=pcall(function() return obj[item.Name] end); local state=ok and typeof(signal)=="RBXScriptSignal" and "RBXScriptSignal" or "not indexable"
-				if ok and typeof(signal)=="RBXScriptSignal" and Main.HasCapability and Main.HasCapability("GetConnections") then local cok,connections=pcall(env.getconnections,signal); if cok and type(connections)=="table" then state=state.."  ·  "..#connections.." connection(s)" end end
-				line=line.."  ·  "..state
-			elseif item.Kind=="Callback" then
-				local ok,val=pcall(function() return obj[item.Name] end); line=line.."  ·  "..(ok and typeof(val)=="function" and "function" or (ok and "indexable" or "not indexable"))
+		local results,schema=Properties.Reflection.SearchSchema(obj.ClassName,inspector.Search.Text)
+		local counts={Property=0,Event=0,Callback=0,Function=0}; for _,item in ipairs(results) do counts[item.Kind]=(counts[item.Kind] or 0)+1 end
+		inspector.Header.Text=obj.ClassName.."  ·  Live Class Schema"
+		local info=ModernPanel(inspector.Body,Settings.Theme.Main2,8); info.Size=UDim2.new(1,-8,0,72)
+		local it=Instance.new("TextLabel"); it.BackgroundTransparency=1; it.Position=UDim2.new(0,12,0,8); it.Size=UDim2.new(1,-24,0,54); it.Font=Enum.Font.Gotham; it.TextSize=11; it.TextColor3=Settings.Theme.SubText; it.TextXAlignment=Enum.TextXAlignment.Left; it.TextYAlignment=Enum.TextYAlignment.Top; it.TextWrapped=true; it.Text="INSTANCE  "..path.."\nINHERITANCE  "..table.concat(schema.Chain,"  <  ").."\nMEMBERS  "..#results.."   •   P "..counts.Property.."   E "..counts.Event.."   C "..counts.Callback.."   F "..counts.Function; it.Parent=info
+		for _,item in ipairs(results) do
+			if inspector.Filter=="All" or inspector.Filter==item.Kind then
+				local member=item.Member; local detail=""
+				if item.Kind=="Property" then
+					local tags={}; for tag in pairs(member.Tags or {}) do tags[#tags+1]=tostring(tag) end; table.sort(tags); local ok,val=pcall(function() return obj[item.Name] end); local actual=ok and tostring(val) or "<unavailable>"; if #actual>140 then actual=actual:sub(1,137).."..." end
+					detail=tostring(member.ValueType and member.ValueType.Name or "unknown").."  •  "..Properties.Reflection.GetBadge(member).."  •  Actual: "..actual; if #tags>0 then detail=detail.."  •  "..table.concat(tags,",") end
+				elseif item.Kind=="Event" then local ok,sig=pcall(function() return obj[item.Name] end); detail=ok and typeof(sig)=="RBXScriptSignal" and "RBXScriptSignal" or "not indexable"; if ok and typeof(sig)=="RBXScriptSignal" and Main.HasCapability("GetConnections") then local cok,cs=pcall(env.getconnections,sig); if cok and type(cs)=="table" then detail=detail.."  •  "..#cs.." connection(s)" end end
+				elseif item.Kind=="Callback" then local ok,v=pcall(function() return obj[item.Name] end); detail=ok and typeof(v)=="function" and "function" or "not indexable"
+				end
+				ModernRow(inspector.Body,item.Name,item.Kind,detail)
 			end
-			add(line,false)
 		end
-		if #results==0 then add("No schema members matched '"..tostring(inspector.Search.Text).."'. Try a case-insensitive search such as idle, name, character, event, or callback.",true) end
+		if #results==0 then ModernRow(inspector.Body,"No schema members matched your search.","EMPTY","The reflection schema is loaded, but this filter returned no members.") end
 		inspector.Window:Show()
 	end
 
 	Properties.ShowConnectionsInspector = function(obj)
-		if not obj or not Main.HasCapability or not Main.HasCapability("GetConnections") then return end
+		if not obj or not Main.HasCapability("GetConnections") then return end
 		local inspector=Properties.ConnectionsInspector
 		if not inspector then
-			local win=Lib.Window.new(); win:SetTitle("Connections Inspector"); win:Resize(760,520)
-			local root=Instance.new("Frame"); root.BackgroundTransparency=1; root.Size=UDim2.new(1,0,1,0); root.Parent=win.GuiElems.Content
-			local header=Instance.new("TextLabel"); header.BackgroundTransparency=1; header.Position=UDim2.new(0,8,0,6); header.Size=UDim2.new(1,-16,0,24); header.TextColor3=Settings.Theme.Text; header.TextXAlignment=Enum.TextXAlignment.Left; header.Font=Enum.Font.SourceSansBold; header.TextSize=16; header.Parent=root
-			local body=Instance.new("ScrollingFrame"); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.Position=UDim2.new(0,6,0,34); body.Size=UDim2.new(1,-12,1,-40); body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.CanvasSize=UDim2.new(); body.ScrollBarThickness=6; body.Parent=root
-			local layout=Instance.new("UIListLayout"); layout.Padding=UDim.new(0,5); layout.Parent=body
-			inspector={Window=win,Header=header,Body=body}; Properties.ConnectionsInspector=inspector
+			local win=Lib.Window.new(); win:SetTitle("Real Dex  •  Connections"); win:Resize(900,620)
+			local root=Instance.new("Frame"); root.BackgroundColor3=Settings.Theme.Main1; root.BorderSizePixel=0; root.Size=UDim2.new(1,0,1,0); root.Parent=win.GuiElems.Content
+			local top=ModernPanel(root,Settings.Theme.Main2,10); top.Position=UDim2.new(0,8,0,8); top.Size=UDim2.new(1,-16,0,78); local header=ModernTitle(top,"Connections","Read-only listener inspection  •  source and callback metadata")
+			local refresh=ModernButton(top,"REFRESH",UDim2.new(1,-126,0,40),true); refresh.Size=UDim2.new(0,112,0,28)
+			local body=Instance.new("ScrollingFrame"); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.Position=UDim2.new(0,8,0,94); body.Size=UDim2.new(1,-16,1,-102); body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.CanvasSize=UDim2.new(); body.ScrollBarThickness=5; body.ScrollBarImageColor3=Settings.Theme.Accent; body.Parent=root; local layout=Instance.new("UIListLayout"); layout.Padding=UDim.new(0,6); layout.Parent=body
+			inspector={Window=win,Root=root,Header=header,Body=body,Object=nil}; Properties.ConnectionsInspector=inspector
+			refresh.MouseButton1Click:Connect(function() if inspector.Object then Properties.ShowConnectionsInspector(inspector.Object) end end)
 		end
-		local body=inspector.Body
-		for _,child in ipairs(body:GetChildren()) do if child:IsA("GuiObject") then child:Destroy() end end
-		local path=obj:GetFullName(); pcall(function() if Explorer.GetInstancePath then path=Explorer.GetInstancePath(obj) end end); inspector.Header.Text=path.."  ["..obj.ClassName.."]"
-		local function add(text,bold)
-			local label=Instance.new("TextLabel"); label.BackgroundColor3=Settings.Theme.Main2; label.BorderSizePixel=0; label.Size=UDim2.new(1,-4,0,24); label.AutomaticSize=Enum.AutomaticSize.Y; label.TextWrapped=true; label.TextXAlignment=Enum.TextXAlignment.Left; label.TextYAlignment=Enum.TextYAlignment.Top; label.Font=bold and Enum.Font.SourceSansBold or Enum.Font.SourceSans; label.TextSize=bold and 14 or 13; label.TextColor3=Settings.Theme.Text; label.Text=text; label.Parent=body; return label
-		end
-		local events=Properties.Reflection.GetEvents(obj.ClassName); local names={}
-		for name in pairs(events) do names[#names+1]=name end; table.sort(names)
-		local total=0
-		for _,name in ipairs(names) do
-			local ok,signal=pcall(function() return obj[name] end)
-			if ok and typeof(signal)=="RBXScriptSignal" then
-				local cok,connections=pcall(env.getconnections,signal)
-				if cok and type(connections)=="table" then
-					add(name.."  ·  "..tostring(#connections).." connection(s)",true)
-					for index,con in ipairs(connections) do
-						total=total+1; local info=Properties.GetConnectionInfo(con); local lines={"#"..index.."  "..(info.Enabled==nil and "state: ?" or (info.Enabled and "enabled" or "disabled"))}
-						if info.Script then lines[#lines+1]="Script: "..info.Script:GetFullName() elseif info.Source then lines[#lines+1]="Source: "..tostring(info.Source)..(info.Line and (":"..tostring(info.Line)) or "") else lines[#lines+1]="Script: unavailable from this connection object" end
-						if info.Name and tostring(info.Name)~="" then lines[#lines+1]="Callback: "..tostring(info.Name) end
-						add(table.concat(lines,"\n"))
-					end
-				end
-			end
-		end
-		if #names==0 then add("No reflected RBXScriptSignal members were found for this class.",true) elseif total==0 then add("The class exposes signals, but none returned accessible connections in this executor.") end
+		inspector.Object=obj
+		for _,child in ipairs(inspector.Body:GetChildren()) do if child:IsA("GuiObject") then child:Destroy() end end
+		local path=obj:GetFullName(); pcall(function() if Explorer.GetInstancePath then path=Explorer.GetInstancePath(obj) end end); inspector.Header.Text=obj.ClassName.."  ·  "..path
+		local events=Properties.Reflection.GetEvents(obj.ClassName); local names={}; for name in pairs(events) do names[#names+1]=name end; table.sort(names); local total=0
+		for _,name in ipairs(names) do local ok,sig=pcall(function() return obj[name] end); if ok and typeof(sig)=="RBXScriptSignal" then local cok,connections=pcall(env.getconnections,sig); if cok and type(connections)=="table" then local card=ModernPanel(inspector.Body,Settings.Theme.Main2,8); card.Size=UDim2.new(1,-8,0,44); local lab=Instance.new("TextLabel"); lab.BackgroundTransparency=1; lab.Position=UDim2.new(0,12,0,7); lab.Size=UDim2.new(1,-24,0,30); lab.Font=Enum.Font.GothamMedium; lab.TextSize=12; lab.TextColor3=Settings.Theme.Text; lab.TextXAlignment=Enum.TextXAlignment.Left; lab.Text="●  "..name.."     "..#connections.." connection(s)"; lab.Parent=card; for index,con in ipairs(connections) do total+=1; local info=Properties.GetConnectionInfo(con); local detail=(info.Enabled==nil and "state ?" or (info.Enabled and "enabled" or "disabled")); if info.Script then detail=detail.."  •  "..info.Script:GetFullName() elseif info.Source then detail=detail.."  •  "..tostring(info.Source)..(info.Line and ":"..tostring(info.Line) or "") end; ModernRow(inspector.Body,"#"..index.."  "..(info.Name or "listener"),"LISTENER",detail) end end end end
+		if total==0 then ModernRow(inspector.Body,"No accessible connections found.","EMPTY","The signal metadata is available, but this environment did not expose listener objects.") end
 		inspector.Window:Show()
 	end
 
 	Properties.ShowRemoteInspector = function(obj)
 		if not obj then return end
-		local inspector = Properties.RemoteInspector
+		local inspector=Properties.RemoteInspector
 		if not inspector then
-			local win = Lib.Window.new()
-			win:SetTitle("Remote Inspector")
-			win:Resize(620,420)
-			local root = Instance.new("Frame")
-			root.BackgroundTransparency = 1
-			root.Size = UDim2.new(1,0,1,0)
-			root.Parent = win.GuiElems.Content
-
-			local header = Instance.new("TextLabel")
-			header.BackgroundTransparency = 1
-			header.Position = UDim2.new(0,6,0,4)
-			header.Size = UDim2.new(1,-12,0,22)
-			header.TextColor3 = Settings.Theme.Text
-			header.TextXAlignment = Enum.TextXAlignment.Left
-			header.Font = Enum.Font.SourceSansBold
-			header.TextSize = 15
-			header.Parent = root
-
-			local body = Instance.new("ScrollingFrame")
-			body.BackgroundTransparency = 1
-			body.BorderSizePixel = 0
-			body.Position = UDim2.new(0,4,0,30)
-			body.Size = UDim2.new(1,-8,1,-34)
-			body.AutomaticCanvasSize = Enum.AutomaticSize.Y
-			body.CanvasSize = UDim2.new()
-			body.ScrollBarThickness = 6
-			body.Parent = root
-			local layout = Instance.new("UIListLayout")
-			layout.Padding = UDim.new(0,4)
-			layout.Parent = body
-
-			inspector = {Window=win,Header=header,Body=body}
-			Properties.RemoteInspector = inspector
+			local win=Lib.Window.new(); win:SetTitle("Real Dex  •  Remote Inspector"); win:Resize(920,600)
+			local root=Instance.new("Frame"); root.BackgroundColor3=Settings.Theme.Main1; root.BorderSizePixel=0; root.Size=UDim2.new(1,0,1,0); root.Parent=win.GuiElems.Content
+			local top=ModernPanel(root,Settings.Theme.Main2,10); top.Position=UDim2.new(0,8,0,8); top.Size=UDim2.new(1,-16,0,92)
+			local header=ModernTitle(top,"Remote Inspector","RemoteEvent / RemoteFunction  •  inspect, copy, monitor")
+			local copy=ModernButton(top,"COPY CALL",UDim2.new(1,-126,0,46),true); copy.Size=UDim2.new(0,112,0,28)
+			local tabs=ModernPanel(root,Settings.Theme.Main2,8); tabs.Position=UDim2.new(0,8,0,108); tabs.Size=UDim2.new(1,-16,0,38)
+			local body=Instance.new("ScrollingFrame"); body.BackgroundTransparency=1; body.BorderSizePixel=0; body.Position=UDim2.new(0,8,0,154); body.Size=UDim2.new(1,-16,1,-162); body.AutomaticCanvasSize=Enum.AutomaticSize.Y; body.CanvasSize=UDim2.new(); body.ScrollBarThickness=5; body.ScrollBarImageColor3=Settings.Theme.Accent; body.Parent=root; local layout=Instance.new("UIListLayout"); layout.Padding=UDim.new(0,6); layout.Parent=body
+			inspector={Window=win,Root=root,Header=header,Tabs=tabs,Body=body,Object=nil,Filter="Overview",Call=""}; Properties.RemoteInspector=inspector
+			for i,filter in ipairs({"Overview","Connections","Call"}) do local b=ModernButton(tabs,filter,UDim2.new(0,(i-1)*118,0,5),i==1); b.Size=UDim2.new(0,108,0,28); b.MouseButton1Click:Connect(function() inspector.Filter=filter; Properties.ShowRemoteInspector(inspector.Object) end) end
+			copy.MouseButton1Click:Connect(function() if inspector.Call and env.setclipboard then pcall(env.setclipboard,inspector.Call) end end)
 		end
-
-		local body = inspector.Body
-		for _,child in ipairs(body:GetChildren()) do
-			if child:IsA("GuiObject") then child:Destroy() end
-		end
-
-		inspector.Header.Text = tostring(obj:GetFullName()) .. "  [" .. obj.ClassName .. "]"
-		local function add(text,bold)
-			local label = Instance.new("TextLabel")
-			label.BackgroundColor3 = Settings.Theme.Main2
-			label.BorderSizePixel = 0
-			label.Size = UDim2.new(1,-4,0,math.max(22,math.ceil(service.TextService:GetTextSize(text,14,Enum.Font.SourceSans,Vector2.new(body.AbsoluteSize.X-12,1000)).Y+6)))
-			label.AutomaticSize = Enum.AutomaticSize.Y
-			label.TextWrapped = true
-			label.TextXAlignment = Enum.TextXAlignment.Left
-			label.TextYAlignment = Enum.TextYAlignment.Top
-			label.Font = bold and Enum.Font.SourceSansBold or Enum.Font.SourceSans
-			label.TextSize = 14
-			label.TextColor3 = Settings.Theme.Text
-			label.Text = text
-			label.Parent = body
-		end
-
-		local path = obj:GetFullName()
-		pcall(function()
-			if Explorer.GetInstancePath then path = Explorer.GetInstancePath(obj) end
-		end)
-		local method = (obj:IsA("RemoteFunction") and ":InvokeServer") or ":FireServer"
-		add("Live caller history is not available from a RemoteEvent/RemoteFunction's public client API. Dex does not install a __namecall hook here, so this inspector cannot truthfully attribute a caller or capture arguments retroactively.",true)
-		add("Remote: "..path)
-		add("Type: "..obj.ClassName)
-		add("Example call:\nlocal remote = "..path.."\nremote"..method.."(arg1, arg2)")
-
-		local events = Properties.Reflection.GetEvents(obj.ClassName)
-		local names = {}
-		for name,_ in pairs(events) do names[#names+1] = name end
-		table.sort(names)
-		if #names > 0 then
-			if Main.HasCapability and Main.HasCapability("GetConnections") then
-				add("Accessible signals / connection counts:",true)
-				for _,name in ipairs(names) do
-					local ok,signal = pcall(function() return obj[name] end)
-					if ok and typeof(signal) == "RBXScriptSignal" then
-						local cok,connections = pcall(env.getconnections,signal)
-						if cok and type(connections) == "table" then
-							add(name.."  —  "..tostring(#connections).." accessible connection(s)",true)
-							for index,con in ipairs(connections) do
-								local info=Properties.GetConnectionInfo(con)
-								local line="#"..index.."  "..(info.Enabled==nil and "state: ?" or (info.Enabled and "enabled" or "disabled"))
-								if info.Script then line=line.."  ·  "..info.Script:GetFullName() elseif info.Source then line=line.."  ·  "..tostring(info.Source)..(info.Line and (":"..tostring(info.Line)) or "") else line=line.."  ·  callback source unavailable" end
-								add(line)
-							end
-						end
-					end
-				end
-			else
-				add("Connection enumeration is unavailable on this executor; reflection metadata is still available.")
-			end
+		inspector.Object=obj; for _,child in ipairs(inspector.Body:GetChildren()) do if child:IsA("GuiObject") then child:Destroy() end end
+		local path=obj:GetFullName(); pcall(function() if Explorer.GetInstancePath then path=Explorer.GetInstancePath(obj) end end); local method=(obj:IsA("RemoteFunction") and ":InvokeServer") or ":FireServer"; inspector.Call="local remote = "..path.."\nremote"..method.."(arg1, arg2)"; inspector.Header.Text=obj.ClassName.."  ·  "..path
+		if inspector.Filter=="Overview" then
+			ModernRow(inspector.Body,"REMOTE READY","STATUS",""..obj.ClassName.."  •  example generation available  •  no live caller history installed")
+			ModernRow(inspector.Body,"CALL TEMPLATE","LUA",inspector.Call)
+			ModernRow(inspector.Body,"LIVE HISTORY","INFO","Real Dex does not install a __namecall hook or capture arguments retroactively, so caller/argument history cannot be fabricated.")
+			if obj:IsA("RemoteEvent") or obj:IsA("UnreliableRemoteEvent") then ModernRow(inspector.Body,"FIRE SERVER","METHOD","remote:FireServer(arg1, arg2)") elseif obj:IsA("RemoteFunction") then ModernRow(inspector.Body,"INVOKE SERVER","METHOD","remote:InvokeServer(arg1, arg2)") end
+		elseif inspector.Filter=="Call" then
+			ModernRow(inspector.Body,"COPYABLE TEMPLATE","CALL",inspector.Call)
+			ModernRow(inspector.Body,"RECALL","DISABLED","Live replay is intentionally not exposed here. You can copy the generated call and inspect it in your own code instead.")
+		elseif inspector.Filter=="Connections" then
+			local events=Properties.Reflection.GetEvents(obj.ClassName); local names={}; for name in pairs(events) do names[#names+1]=name end; table.sort(names); local total=0
+			for _,name in ipairs(names) do local ok,sig=pcall(function() return obj[name] end); if ok and typeof(sig)=="RBXScriptSignal" then local cok,cs=pcall(env.getconnections,sig); if cok and type(cs)=="table" then ModernRow(inspector.Body,name,"SIGNAL",#cs.." accessible connection(s)"); total+=#cs end end end
+			if total==0 then ModernRow(inspector.Body,"No accessible remote listeners.","EMPTY","The signal exists in reflection metadata, but listener enumeration returned nothing accessible.") end
 		end
 		inspector.Window:Show()
 	end
@@ -13613,7 +13549,7 @@ end,
 --[[
 	Save Instance App Module
 	
-	Revival of the old dex's Save Instance
+	Revival of the old save-instance implementation
 ]] 
 
 -- all the module locals. yes, there are too many.
@@ -13750,7 +13686,7 @@ local function main()
 		
 		-- ListFrame
 		
-		-- Fake ScrollBar dex, because its too advanced
+		-- Compatibility scrollbar; the renderer needs its own implementation
 		ListFrame = Instance.new("ScrollingFrame")
 		ListFrame.Parent = window.GuiElems.Content
 		ListFrame.Size = UDim2.new(1, 0,1, -40)
@@ -14224,7 +14160,7 @@ end,
 --[[
 	Save Instance App Module
 	
-	Revival of the old dex's Save Instance
+	Revival of the old save-instance implementation
 ]] 
 
 -- all the module locals. yes, there are too many.
@@ -14712,6 +14648,10 @@ DefaultSettings = (function()
 			ScaleType = 0 -- 0 Full Name Shown, 1 Equal Halves
 		},
 		Theme = {
+			Accent = rgb(66,170,255),
+			AccentHover = rgb(91,190,255),
+			SubText = rgb(145,156,170),
+			Line = rgb(54,72,92),
 			_Recurse = true,
 			Main1 = rgb(28,31,36),
 			Main2 = rgb(23,26,31),
@@ -15048,7 +14988,7 @@ Main = (function()
 
 				-- Check if local copy exists with matching hashs
 				local hashfunc = (syn and syn.crypt.hash) or function() return "" end
-				local filePath = "dex/ModuleCache/"..name..".lua"
+				local filePath = "RD/ModuleCache/"..name..".lua"
 				local s,moduleStr = pcall(env.readfile,filePath)
 
 				if s and hashfunc(moduleStr) == hashs[name] then
@@ -15448,7 +15388,7 @@ Main = (function()
 			t.TextColor3 = Color3.new(1,1,1)
 			t.TextWrapped = true
 			t.TextScaled = true
-			t.Text = "\n\n\n\n\n\n\n\nHello Skidsploit user,\nZinnia, Chillz and the Secret Service does not approve of Dex being used on your skidsploit.\nPlease consider getting something better.\n\nIncompatible Reason: "..reason.."\n\n\n\n\n\n\n\n"
+			t.Text = "\n\n\n\n\n\n\n\nHello Skidsploit user,\nZinnia, Chillz and the Secret Service does not approve of Real Dex being used on your skidsploit.\nPlease consider getting something better.\n\nIncompatible Reason: "..reason.."\n\n\n\n\n\n\n\n"
 			
 			-- This sound wont work!!!
 			local sound = Instance.new("Sound",msg)
@@ -15605,7 +15545,7 @@ Main = (function()
 		local api,rawAPI
 		if Main.Elevated then
 			if Main.LocalDepsUpToDate() then
-				local localAPI = Lib.ReadFile("dex/rbx_api.dat")
+				local localAPI = Lib.ReadFile("RD/rbx_api.dat")
 				if localAPI then 
 					rawAPI = localAPI
 				else
@@ -15766,7 +15706,7 @@ Main = (function()
 		local rawXML
 		if Main.Elevated then
 			if Main.LocalDepsUpToDate() then
-				local localRMD = Lib.ReadFile("dex/rbx_rmd.dat")
+				local localRMD = Lib.ReadFile("RD/rbx_rmd.dat")
 				if localRMD then 
 					rawXML = localRMD
 				else
@@ -16295,10 +16235,10 @@ Main = (function()
 		openButton.MainFrame.BottomFrame.Information.MouseButton1Click:Connect(function()
 			local duration = 1
 			local Infos = {
-				"Contributors >>",
-				"Toon (IY Dex and PRs)",
-				"Moon (Dex)",
-				"Cazan (3D Preview)",
+				"REAL DEX >>",
+				"Created and maintained by Mistar Novier",
+				"Real Dex Project • Mistar Novier",
+				"Reflection • Explorer • Inspection",
 			}
 			
 			if isInfoCD then return end
@@ -16372,11 +16312,11 @@ Main = (function()
 
 		local writefile,makefolder = env.writefile,env.makefolder
 
-		makefolder("dex")
-		makefolder("dex/assets")
-		makefolder("dex/saved")
-		makefolder("dex/plugins")
-		makefolder("dex/ModuleCache")
+		makefolder("RD")
+		makefolder("RD/assets")
+		makefolder("RD/saved")
+		makefolder("RD/plugins")
+		makefolder("RD/ModuleCache")
 	end
 
 	Main.SaveCurrentSettings = function()
@@ -16441,7 +16381,7 @@ Main = (function()
 		-- Fetch version if needed
 		intro.SetProgress("Fetching Roblox Version",0.3)
 		if Main.Elevated then
-			local fileVer = Lib.ReadFile("dex/deps_version.dat")
+			local fileVer = Lib.ReadFile("RD/deps_version.dat")
 			Main.ClientVersion = Version()
 			if fileVer then
 				Main.DepsVersionData = string.split(fileVer,"\n")
@@ -16473,9 +16413,9 @@ Main = (function()
 
 		-- Save external deps locally if needed
 		if Main.Elevated and env.writefile and not Main.LocalDepsUpToDate() then
-			env.writefile("dex/deps_version.dat",Main.ClientVersion.."\n"..Main.RobloxVersion)
-			env.writefile("dex/rbx_api.dat",Main.RawAPI)
-			env.writefile("dex/rbx_rmd.dat",Main.RawRMD)
+			env.writefile("RD/deps_version.dat",Main.ClientVersion.."\n"..Main.RobloxVersion)
+			env.writefile("RD/rbx_api.dat",Main.RawAPI)
+			env.writefile("RD/rbx_rmd.dat",Main.RawRMD)
 		end
 
 		-- Load other modules
@@ -16497,9 +16437,9 @@ Main = (function()
 		
 		
 		if env.readfile and listfiles then
-			if #listfiles("dex/plugins") > 0 then
+			if #listfiles("RD/plugins") > 0 then
 				intro.SetProgress("Loading Plugin Files",0.8)
-				for _, pluginDir in pairs(listfiles("dex/plugins")) do
+				for _, pluginDir in pairs(listfiles("RD/plugins")) do
 					local moduleData = Main.LoadPluginFile(pluginDir)
 					moduleData.PluginData = moduleData.PluginData or {}
 
